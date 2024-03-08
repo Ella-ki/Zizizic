@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "848352881117",
+    "project_id": "zizizic-8e678",
+    "storage_bucket": "zizizic-8e678.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:848352881117:android:c8b4fd109fe11015376e34",
+        "android_client_info": {
+          "package_name": "com.zizizic"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyARDTxBeF9RlM-dHNZPVmG1H_VthvYEglY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
