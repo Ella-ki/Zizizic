@@ -1,74 +1,40 @@
 import 'package:flutter/material.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:zizizic/signPage.dart';
 import 'login.dart';
+import 'package:path/path.dart';
+import 'package:sqflite/sqflite.dart';
+import 'mainPage.dart';
 
-void main() {
-  WidgetsFlutterBinding.ensureInitialized();
-  MobileAds.instance.initialize();
-  runApp(MyApp());
-}
+
+void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
+
+  Future<Database> initDatabase() async {
+    return openDatabase(
+      join(await getDatabasesPath(), 'tour_database.db'),
+      onCreate: (db, version) {
+        return db.execute(
+          "CREATE TABLE place(id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT, tel TEXT , zipcode TEXT , address TEXT , mapx Number , mapy Number , imagePath TEXT)",
+        );
+      },
+      version: 1,
+    );
+  }
+
+
   @override
   Widget build(BuildContext context) {
+    Future<Database> database = initDatabase(); // build 할때 initDatabase() 함수를 호출합니다
     return MaterialApp(
-      title: '지지직 전기차 충전소 찾기',
+      title: '모두의 여행',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
       initialRoute: '/',
       routes: {
-        '/': (context) => LoginPage(),
+        '/': (context) => MainPage(),
         '/sign': (context) => SignPage(),
-      },
-    );
-  }
-}
-
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-  final String title;
-
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-
-  void _incrementCounter() {
-    setState(() {
-      _counter++;
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Text(widget.title),
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text(
-              'You have pushed the button this many times:',
-            ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
-          ],
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ),
-    );
-  }
+        '/main': (context) => MainPage(),
+      },);}
 }

@@ -1,23 +1,23 @@
 import 'package:firebase_database/firebase_database.dart';
 
-class User {
+class Review {
   String key;
   String id;
-  String pw;
+  String review;
   String createTime;
 
-  User(this.id, this.pw, this.createTime);
+  Review(this.id, this.review, this.createTime);
 
-  User.fromSnapshot(DataSnapshot snapshot)
+  Review.fromSnapshot(DataSnapshot snapshot)
       : key = snapshot.key,
         id = snapshot.value['id'],
-        pw = snapshot.value['pw'],
+        review = snapshot.value['review'],
         createTime = snapshot.value['createTime'];
 
   toJson() {
     return {
       'id': id,
-      'pw': pw,
+      'review': review,
       'createTime': createTime,
     };
   }
