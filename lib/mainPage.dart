@@ -1,108 +1,62 @@
 import 'package:firebase_database/firebase_database.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sqflite/sqflite.dart';
 import 'main/favoritePage.dart';
 import 'main/settingPage.dart';
 import 'main/mapPage.dart';
 
 class MainPage extends StatefulWidget {
-  // final Future<Database> database;
-  // MainPage(this.database);
+  final Future<Database> database;
+  MainPage(this.database, {super.key});
   @override
-  State<StatefulWidget> createState() => _MainPage()
-  ;
+  State<StatefulWidget> createState() => _MainPage();
 }
 
 class _MainPage extends State<MainPage> with SingleTickerProviderStateMixin {
-  late TabController controller;
-  late FirebaseDatabase _database;
-  late DatabaseReference reference;
-  String _databaseURL = 'https://zizizic-8e678-default-rtdb.firebaseio.com/';
-  late String id;
+  TabController? controller;
+  FirebaseDatabase? _database;
+  DatabaseReference? reference;
+  String? id;
 
-  final FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
   bool pushCheck = true;
 
   @override
   void initState() {
     super.initState();
     controller = TabController(length: 3, vsync: this);
-    _database = FirebaseDatabase(databaseURL: _databaseURL);
-    reference = _database.reference().child('tour');
-
-    _firebaseMessaging.configure(
-      onMessage: (Map<String, dynamic> message) async {
-        _loadData();
-        print(pushCheck);
-        if (pushCheck) {showDialog(
-          context: context,
-          builder: (context) => AlertDialog(
-            content: ListTile(
-              title: Text(message['notification']['title']),
-              subtitle: Text(message['notification']['body']),
-            ),
-            actions: <Widget>[
-              ElevatedButton(
-                child: Text('Ok'),
-                onPressed: () => Navigator.of(context).pop(),
-              ),
-            ],
-          ),
-        );
-        }
-      },
-      onLaunch: (Map<String, dynamic> message) async {
-        _loadData();
-        if (pushCheck) {
-          Navigator.of(context).pushNamed('/');
-        }
-      },
-      onResume: (Map<String, dynamic> message) async {
-        _loadData();
-        if (pushCheck) {
-          Navigator.of(context).pushNamed('/');
-        }
-      },
-    );
+    _database = FirebaseDatabase.instance;
+    reference = _database!.ref().child('tour');
   }
 
   @override
   void dispose() {
-    controller.dispose();
+    controller!.dispose();
     super.dispose();
-  }
-
-  void _loadData() async {
-    var key = "push";
-    SharedPreferences pref = await SharedPreferences.getInstance();
-    pushCheck = pref.getBool(key);
   }
 
   @override
   Widget build(BuildContext context) {
-    id = ModalRoute.of(context).settings.arguments;
+    id = ModalRoute.of(context)!.settings.arguments as String?;
     return Scaffold(
         body: TabBarView(
+          controller: controller,
           children: <Widget>[
             // TabBarView에 채울 위젯들
             MapPage(
-              databaseReference: reference,
-              // db: widget.database,
-              id: id,
+              databaseReference: reference!,
+              db: widget.database,
+              id: id!,
             ),
             FavoritePage(
-              databaseReference: reference,
-              // db: widget.database,
-              id: id,
+              databaseReference: reference!,
+              db: widget.database,
+              id: id!,
             ),
             SettingPage()
           ],
-          controller: controller,
         ),
         bottomNavigationBar: TabBar(
-          tabs: <Tab>[
+          tabs: const <Tab>[
             Tab(
               icon: Icon(Icons.map),
             ),

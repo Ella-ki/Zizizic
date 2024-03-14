@@ -2,16 +2,16 @@ import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:http/http.dart' as http;
-import 'package:zizizic/data/tour.dart';
-import 'package:zizizic/data/listData.dart';
 import 'package:sqflite/sqflite.dart';
 
+import '../data/listData.dart';
+import '../data/tour.dart';
 import 'tourDetailPage.dart';
 
 class MapPage extends StatefulWidget {
-  final DatabaseReference databaseReference; // 실시간 데이터베이스 변수
-  final Future<Database> db; // 내부에 저장되는 데이터베이스
-  final String id; // 로그인한 아이디
+  final DatabaseReference? databaseReference; // 실시간 데이터베이스 변수
+  final Future<Database>? db; // 내부에 저장되는 데이터베이스
+  final String? id; // 로그인한 아이디
   MapPage({this.databaseReference, this.db, this.id});
 
   @override
@@ -19,13 +19,13 @@ class MapPage extends StatefulWidget {
 }
 
 class _MapPage extends State<MapPage> {
-  List<DropdownMenuItem> list = List();
-  List<DropdownMenuItem> sublist = List();
-  List<TourData> tourData = List();
-  ScrollController _scrollController;
-  String authKey = 'e4Lpbx%2FXvBuimng8xNoqBJ5i3PTKk28oC26aU8iOeFy%2Fd3qPSReHHGcmRkvn3cEZu3pJi9Gq0jNZokmMo%2FhMEA%3D%3D';
-  Item area;
-  Item kind;
+  List<DropdownMenuItem<Item>> list = List.empty(growable: true);
+  List<DropdownMenuItem<Item>> sublist = List.empty(growable: true);
+  List<TourData> tourData = List.empty(growable: true);
+  ScrollController? _scrollController;
+  String authKey = 'NyZeSq4N2Vr5k%2FOjpie7RzHh3M%2FzELiqGJHwm8tHgVIVH1PCnw1mYv6rkn9AaIb8zScYJOlt%2Fvo2FTXYE6En9A%3D%3D';
+  Item? area;
+  Item? kind;
   int page = 1;
 
   @override
@@ -36,12 +36,12 @@ class _MapPage extends State<MapPage> {
     area = list[0].value;
     kind = sublist[0].value;
     _scrollController = new ScrollController();
-    _scrollController.addListener(() {
-      if (_scrollController.offset >=
-          _scrollController.position.maxScrollExtent &&
-          !_scrollController.position.outOfRange) {
+    _scrollController!.addListener(() {
+      if (_scrollController!.offset >=
+          _scrollController!.position.maxScrollExtent &&
+          !_scrollController!.position.outOfRange) {
         page++;
-        getAreaList(area: area.value, contentTypeId: kind.value, page: page);
+        getAreaList(area: area!.value, contentTypeId: kind!.value, page: page);
       }
     });
   }
@@ -50,31 +50,32 @@ class _MapPage extends State<MapPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('검색하기'),
+        title: const Text('검색하기'),
       ),
       body: Container(
         child: Center(
           child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
             children: <Widget>[
               Row(
                 children: <Widget>[
-                  DropdownButton(
-                    items: list,
+                  DropdownButton<Item>(
+                    value: area,
                     onChanged: (value) {
-                      Item selectedItem = value;
+                      Item selectedItem = value!;
                       setState(() {
                         area = selectedItem;
                       });
                     },
-                    value: area,
+                    items: list,
                   ),
                   SizedBox(
                     width: 10,
                   ),
-                  DropdownButton(
+                  DropdownButton<Item>(
                     items: sublist,
                     onChanged: (value) {
-                      Item selectedItem = value;
+                      Item selectedItem = value!;
                       setState(() {
                         kind = selectedItem;
                       });
@@ -84,13 +85,13 @@ class _MapPage extends State<MapPage> {
                   SizedBox(
                     width: 10,
                   ),
-                  RaisedButton(
+                  MaterialButton(
                     onPressed: () {
                       page = 1;
                       tourData.clear();
                       getAreaList(
-                          area: area.value,
-                          contentTypeId: kind.value,
+                          area: area!.value,
+                          contentTypeId: kind!.value,
                           page: page);
                     },
                     child: Text(
@@ -112,7 +113,7 @@ class _MapPage extends State<MapPage> {
                               Hero(
                                   tag: 'tourinfo$index',
                                   child: Container(
-                                      margin: EdgeInsets.all(10),
+                                      margin: const EdgeInsets.all(10),
                                       width: 100.0,
                                       height: 100.0,
                                       decoration: BoxDecoration(
@@ -121,21 +122,19 @@ class _MapPage extends State<MapPage> {
                                               color: Colors.black, width: 1),
                                           image: DecorationImage(
                                               fit: BoxFit.fill,
-                                              image: tourData[index].imagePath !=
-                                                  null
-                                                  ? NetworkImage(
-                                                  tourData[index].imagePath)
-                                                  : AssetImage(
-                                                  'repo/images/map_location.png'))))),
-                              SizedBox(
+                                              image: getImage(
+                                                  tourData[index].imagePath))))),
+                              const SizedBox(
                                 width: 20,
                               ),
-                              Container(
+                              SizedBox(
+                                width: MediaQuery.of(context).size.width - 150,
                                 child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                   children: <Widget>[
                                     Text(
-                                      tourData[index].title,
-                                      style: TextStyle(
+                                      tourData[index].title!,
+                                      style: const TextStyle(
                                           fontSize: 20,
                                           fontWeight: FontWeight.bold),
                                     ),
@@ -144,9 +143,7 @@ class _MapPage extends State<MapPage> {
                                         ? Text('전화 번호 : ${tourData[index].tel}')
                                         : Container(),
                                   ],
-                                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                 ),
-                                width: MediaQuery.of(context).size.width - 150,
                               )
                             ],
                           ),
@@ -160,7 +157,7 @@ class _MapPage extends State<MapPage> {
                                 )));
                           },
                           onDoubleTap: () {
-                            insertTour(widget.db, tourData[index]);
+                            insertTour(widget.db!, tourData[index]);
                           },
                         ),
                       );
@@ -169,7 +166,6 @@ class _MapPage extends State<MapPage> {
                     controller: _scrollController,
                   ))
             ],
-            mainAxisAlignment: MainAxisAlignment.start,
           ),
         ),
       ),
@@ -182,17 +178,30 @@ class _MapPage extends State<MapPage> {
         .insert('place', info.toMap(),
         conflictAlgorithm: ConflictAlgorithm.replace)
         .then((value) {
-      Scaffold.of(context).showSnackBar(SnackBar(content: Text('즐겨찾기에 추가되었습니다')));
+      ScaffoldMessenger.of(context)
+          .showSnackBar(const SnackBar(content: Text('즐겨찾기에 추가되었습니다')));
     });
   }
 
-  void getAreaList({int area, int contentTypeId, int page}) async {
-    var url =
-        'http://api.visitkorea.or.kr/openapi/service/rest/KorService/areaBasedList?ServiceKey =$authKey & MobileOS = AND & MobileApp = ModuTour &_type = json & areaCode = 1 & sigunguCode = $area & pageNo = $page';
-    if (contentTypeId != 0) {
-      url = url + '&contentTypeId=$contentTypeId';
+  ImageProvider getImage(String? imagePath) {
+    if (imagePath != null) {
+      return NetworkImage(imagePath);
+    } else {
+      return const AssetImage('repo/images/map_location.png');
     }
-    var response = await http.get(url);
+  }
+
+  void getAreaList(
+      {required int area,
+        required int contentTypeId,
+        required int page}) async {
+    var url =
+        'http://api.visitkorea.or.kr/openapi/service/rest/KorService/areaBasedList?ServiceKey=$authKey&MobileOS=AND&MobileApp=ModuTour&_type=json&areaCode=1&numOfRows=10&sigunguCode=$area&pageNo=$page';
+    if (contentTypeId != 0) {
+      url = '$url&contentTypeId=$contentTypeId';
+    }
+    print(url);
+    var response = await http.get(Uri.parse(url));
     String body = utf8.decode(response.bodyBytes);
     print(body);
     var json = jsonDecode(body);

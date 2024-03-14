@@ -1,12 +1,12 @@
 class TourData {
-  String title;
-  String tel;
-  String zipcode;
-  String address;
+  String? title;
+  String? tel;
+  String? zipcode;
+  String? address;
   var id;
   var mapx;
   var mapy;
-  var imagePath;
+  String? imagePath;
 
 
   TourData(
